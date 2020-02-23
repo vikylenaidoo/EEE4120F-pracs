@@ -3,7 +3,7 @@
 
 function whiten = createwhiten(n)
   whiten = [];
-  for i = 1:n*48000
+  for i = 1:n*8000
     r = rand()*2-1;
     %whiten = vertcat(whiten, r);
     whiten = [whiten;r];
