@@ -88,6 +88,9 @@ void Fill(float* A){
 //------------------------------------------------------------------------------
 
 int main(){
+N=1;
+while(N<=100){
+ printf("N = %d", N);
  // Initialise OpenCL
  if(
   !OpenCL_Init("NVIDIA"                ) && // nVidia
@@ -101,7 +104,8 @@ int main(){
  // Load a kernel
  if(!OpenCL_LoadKernel("OpenCL/Kernel.cl", "Multiply")) return 1;
 
- N = 3;
+ 
+ //N = 100;
  size_t BufferSize = N*N*sizeof(float);
 
  // Allocate CPU RAM
@@ -123,14 +127,16 @@ int main(){
  // Process the matrices
  tic();
  Process_Serial();
- printf("Serial: %lg ms\n", toc()/1e-3);
+ serial_times[N-1] = toc()/1e-3;
+ printf("Serial: %lg ms\n", serial_times[N-1]);
 
  tic();
  Process_OpenCL();
- printf("\nOpenCL: %lg ms\n\n", toc()/1e-3);
+ opencl_times[N-1] = toc()/1e-3;
+ printf("\nOpenCL: %lg ms\n\n", opencl_times[N-1]);
 
  // Compare results
- Compare();
+ //Compare();
 
  // Clean-up
  free(A);
@@ -143,6 +149,13 @@ int main(){
  OpenCL_FreeBuffer(OutputBuffer);
  OpenCL_Destroy();
 
+N=N+1;
+}
+
+	printf("N,S,P\n");
+for(int i=0; i<100; i++){
+	printf("%d,%f,%f\n", i+1, serial_times[i], opencl_times[i]);
+}
  return 0;
 }
 //------------------------------------------------------------------------------

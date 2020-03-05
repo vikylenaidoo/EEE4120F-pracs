@@ -8,6 +8,8 @@
 // Useful globals
 int    N;
 size_t LocalSize[2] = {1, 1};
+float serial_times[100];
+float opencl_times[100];
 //------------------------------------------------------------------------------
 
 // CPU Memory Handles
