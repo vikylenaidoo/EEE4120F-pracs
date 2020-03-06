@@ -8,8 +8,13 @@
 // Useful globals
 int    N;
 size_t LocalSize[2] = {1, 1};
-float serial_times[100];
+float serial_times[30];
 float opencl_times[100];
+float transfer_overhead;
+float transfer_overheads[30];
+float processing_time;
+float processing_times[30];
+
 //------------------------------------------------------------------------------
 
 // CPU Memory Handles

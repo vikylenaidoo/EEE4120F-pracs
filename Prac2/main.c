@@ -27,15 +27,26 @@ void Process_Serial(){
 
 void Process_OpenCL(){
  printf("\n");
-
  OpenCL_ConstantInt(3, N);
+ 
+ transfer_overhead = 0;
+ processing_time = 0;
 
+ tic();
  OpenCL_WriteData(A_Buffer, N*N*sizeof(float), A);
  OpenCL_WriteData(B_Buffer, N*N*sizeof(float), B);
-
+ transfer_overheads[N-1] = toc()/1e-3;
+ 
+ //processing time
+ tic();
  OpenCL_Run(N, LocalSize);
+ processing_times[N-1] = toc()/1e-3; 
+ printf("\nProcessing Time: %lg ms\n\n", processing_time);
 
+ tic();
  OpenCL_ReadData(OutputBuffer, N*N*sizeof(float), Output_OpenCL);
+ transfer_overheads[N-1] += toc()/1e-3;
+ printf("\nTransfer Time: %lg ms\n\n", transfer_overhead);
 }
 //------------------------------------------------------------------------------
 
@@ -89,8 +100,8 @@ void Fill(float* A){
 
 int main(){
 N=1;
-while(N<=100){
- printf("N = %d", N);
+while(N<=30){
+printf("N = %d", N);
  // Initialise OpenCL
  if(
   !OpenCL_Init("NVIDIA"                ) && // nVidia
@@ -105,7 +116,7 @@ while(N<=100){
  if(!OpenCL_LoadKernel("OpenCL/Kernel.cl", "Multiply")) return 1;
 
  
- //N = 100;
+ //N = 250;
  size_t BufferSize = N*N*sizeof(float);
 
  // Allocate CPU RAM
@@ -127,13 +138,16 @@ while(N<=100){
  // Process the matrices
  tic();
  Process_Serial();
+ //printf("Serial: %lg ms\n", toc()/1e-3);
  serial_times[N-1] = toc()/1e-3;
- printf("Serial: %lg ms\n", serial_times[N-1]);
+ //printf("Serial: %lg ms\n", serial_times[N-1]);
+ 
 
- tic();
+ //tic();
  Process_OpenCL();
- opencl_times[N-1] = toc()/1e-3;
- printf("\nOpenCL: %lg ms\n\n", opencl_times[N-1]);
+ //printf("OpenCL: %lg ms\n", toc()/1e-3);
+// opencl_times[N-1] = toc()/1e-3;
+// printf("\nOpenCL: %lg ms\n\n", opencl_times[N-1]);
 
  // Compare results
  //Compare();
@@ -152,9 +166,9 @@ while(N<=100){
 N=N+1;
 }
 
-	printf("N,S,P\n");
-for(int i=0; i<100; i++){
-	printf("%d,%f,%f\n", i+1, serial_times[i], opencl_times[i]);
+printf("N,Transfer,Processing,Serial\n");
+for(int i=0; i<30; i++){
+	printf("%d,%f,%f,%f\n", (i+1), transfer_overheads[i], processing_times[i],serial_times[i]);
 }
  return 0;
 }

@@ -303,6 +303,9 @@ bool OpenCL_ReadData(cl_mem Buffer, size_t Size, void* Data){
   Data,
   0, 0, 0
  );
+
+error = clFinish(Commands);
+
  if(error != CL_SUCCESS){
   printf("Error: Failed to read buffer\n");
   return false;
@@ -321,6 +324,8 @@ bool OpenCL_WriteData(cl_mem Buffer, size_t Size, void* Data){
   Data,
   0, 0, 0
  );
+error = clFinish(Commands);
+
  if(error != CL_SUCCESS){
   printf("Error: Failed to write buffer.\n");
   return false;
